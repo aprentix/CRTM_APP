@@ -159,6 +159,7 @@ def lista_final(month_datos_via_export, month_datos_vac_export, month_datos_bit_
     lista_totales_union_INTERURBANOS_VCM = lista_totales_union_INTERURBANOS[~lista_totales_union_INTERURBANOS['Concesion'].isin(lista_vacs_interurbano)]
     lista_totales_union_INTERURBANOS_VAC = lista_totales_union_INTERURBANOS[lista_totales_union_INTERURBANOS['Concesion'].isin(lista_vacs_interurbano)]
 
+    lista_totales_union_INTERURBANOS_VAC = pd.merge(lista_totales_union_INTERURBANOS_VAC, lista_totales_union_VACs, how="left")
     print("////// INTERURBANOS VCM/// ", lista_totales_union_INTERURBANOS_VCM.columns)
     print("////// INTERURBANOS VAC/// ", lista_totales_union_INTERURBANOS_VAC.columns)
 
