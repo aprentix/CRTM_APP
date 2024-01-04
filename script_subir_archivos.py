@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import unicodedata
 
-from exceptions_app import ErrorArchivos, ErrorNombreColumnas
+from exceptions_app import *
 
 ## COLUMNAS ESTANDAR
 name_datos_base_cols = ['Idconce', 'Fecha', 'Nexpe', 'Kms', 'Sencillo', 'Indicencia',

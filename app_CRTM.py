@@ -5,6 +5,7 @@ import script_final as sf
 import os
 import sys
 import pandas as pd
+from exceptions_app import *
 
 from flet import (
     ElevatedButton,
