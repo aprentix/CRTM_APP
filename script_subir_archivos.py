@@ -49,8 +49,8 @@ def comprobar_nombres_columnas(diccionario_archivos):
     datos_vac_app = pd.read_excel(diccionario_archivos["datos_vac_app"], sheet_name=0, header=0,  engine='openpyxl', nrows=0)
     datos_vac_val = pd.read_excel(diccionario_archivos["datos_vac_val"], sheet_name=2, header=0,  engine='openpyxl', nrows=0)
 
-    datos_base_cols, datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols = estandarizar_nombres_columnas(datos_via, datos_bit, datos_vac_app, datos_vac_val)
-    name_datos_base_cols_OK, name_datos_via_cols_OK, name_datos_bit_cols_OK, name_datos_vac_app_cols_OK, name_datos_vac_val_cols_OK = estandarizar_nombres_columnas(name_datos_via_cols, name_datos_bit_cols, name_datos_vac_app_cols, name_datos_vac_val_cols)
+    datos_base_cols, datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols = estandarizar_nombres_columnas(datos_base, datos_via, datos_bit, datos_vac_app, datos_vac_val)
+    name_datos_base_cols_OK, name_datos_via_cols_OK, name_datos_bit_cols_OK, name_datos_vac_app_cols_OK, name_datos_vac_val_cols_OK = estandarizar_nombres_columnas(name_datos_base_cols, name_datos_via_cols, name_datos_bit_cols, name_datos_vac_app_cols, name_datos_vac_val_cols)
 
     print("COMPROBANDO LAS DIFERENCIAS ENTRE LAS COLUMNAS: ")
     print("__________________________________________________________\n")
@@ -62,7 +62,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Su fichero contiene las columnas: ", datos_base.columns)
         print("El fichero deseado contiene las columnas: ", name_datos_base_cols)
         print("Corrija las siguientes columnas: ", cols_data_base)
-        mensaje_error+="\nBASE columnas mal: "+str(cols_data_base)
+        mensaje_error+="\nBASE columnas a revisar: "+str(cols_data_base)
     print("__________________________________________________________\n")
     cols_data_via = [col for col in name_datos_via_cols_OK if col not in datos_via_cols]
     if cols_data_via == []:
@@ -72,7 +72,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Su fichero contiene las columnas: ", datos_via.columns)
         print("El fichero deseado contiene las columnas: ", name_datos_via_cols)
         print("Corrija las siguientes columnas: ", cols_data_via)
-        mensaje_error+="\nVIA columnas mal: "+str(cols_data_via)
+        mensaje_error+="\nVIA columnas a revisar: "+str(cols_data_via)
     print("__________________________________________________________\n")
     cols_data_bit = [col for col in name_datos_bit_cols_OK if col not in datos_bit_cols]
     if cols_data_bit == []:
@@ -82,7 +82,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Su fichero contiene las columnas: ", datos_bit.columns)
         print("El fichero deseado contiene las columnas: ", name_datos_bit_cols)
         print("Corrija las siguientes columnas: ", cols_data_bit)
-        mensaje_error+="\nBIT columnas mal: "+str(cols_data_bit)
+        mensaje_error+="\nBIT columnas a revisar: "+str(cols_data_bit)
     print("__________________________________________________________\n")
     cols_data_vac_app = [col for col in name_datos_vac_app_cols_OK if col not in datos_vac_app_cols]
     if cols_data_vac_app == []:
@@ -92,7 +92,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Su fichero contiene las columnas: ", datos_vac_app.columns)
         print("El fichero deseado contiene las columnas: ", name_datos_vac_app_cols)
         print("Corrija las siguientes columnas: ", cols_data_vac_app)
-        mensaje_error+="\nVAC_app columnas mal: "+str(cols_data_vac_app)
+        mensaje_error+="\nVAC_app columnas a revisar: "+str(cols_data_vac_app)
     print("__________________________________________________________\n")
     cols_data_vac_val = [col for col in name_datos_vac_val_cols_OK if col not in datos_vac_val_cols]
     if cols_data_vac_val == []:
@@ -102,7 +102,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Su fichero contiene las columnas: ", datos_vac_val.columns)
         print("El fichero deseado contiene las columnas: ", name_datos_vac_val_cols)
         print("Corrija las siguientes columnas: ", cols_data_vac_val)
-        mensaje_error+="\nVAC_val columnas mal: "+str(cols_data_vac_val)
+        mensaje_error+="\nVAC_val columnas a revisar: "+str(cols_data_vac_val)
     if mensaje_error!="":
         raise ErrorNombreColumnas(mensaje_error)
 

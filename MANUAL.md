@@ -40,4 +40,4 @@ Es una mecanización, por ende, solo respeta procesos repetitivos y podria haber
 Herramienta desarrollada para el departamento Comercial del CRTM en diciembre de 2023.
 Desarrollo: Raquel DC (becaria) bajo la supervisión e instrucciones de Óscar Barrientos García.
 
-Codigo en: https://github.com/aprentix/CRTM privado (para tener backUp (con consentimiento de los interesados)) o en los archivos del Consorcio.
+Codigo en: https://github.com/aprentix/CRTM privado o en los archivos del Consorcio.
