@@ -36,7 +36,6 @@ VAC_VAL = ['Empresa', 'Fecha', 'Concesion', 'L Gestra', 'Desclinea', 'P Gestra',
 ### AVISO: 
 Es una mecanización, por ende, solo respeta procesos repetitivos y podria haber fallos si no se respetan los requisitos.
 
-
 ### Más info
 Herramienta desarrollada para el departamento Comercial del CRTM en diciembre de 2023.
 Desarrollo: Raquel DC (becaria) bajo la supervisión e instrucciones de Óscar Barrientos García.

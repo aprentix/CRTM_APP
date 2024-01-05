@@ -30,14 +30,15 @@ def leer_archivos(diccionario_archivos):
         raise ErrorArchivos("-------- ERROR EN LA CARGA DE ARCHIVOS --------")
 
 
-def estandarizar_nombres_columnas(datos_via, datos_bit, datos_vac_app, datos_vac_val):
+def estandarizar_nombres_columnas(datos_base,datos_via, datos_bit, datos_vac_app, datos_vac_val):
     a,b = 'ÁÉÍÓÚÄËÏÖÜ', 'AEIOUAEIOU'
     trans = str.maketrans(a,b)
+    datos_base = [column_name.upper().translate(trans) for column_name in datos_base]
     datos_via_cols = [column_name.upper().translate(trans) for column_name in datos_via]
     datos_bit_cols = [column_name.upper().translate(trans) for column_name in datos_bit]
     datos_vac_app_cols = [column_name.upper().translate(trans) for column_name in datos_vac_app]
     datos_vac_val_cols = [column_name.upper().translate(trans) for column_name in datos_vac_val]
-    return datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols
+    return datos_base, datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols
 
 def comprobar_nombres_columnas(diccionario_archivos):
     ## cargamos las columnas de los archivos
@@ -48,12 +49,22 @@ def comprobar_nombres_columnas(diccionario_archivos):
     datos_vac_app = pd.read_excel(diccionario_archivos["datos_vac_app"], sheet_name=0, header=0,  engine='openpyxl', nrows=0)
     datos_vac_val = pd.read_excel(diccionario_archivos["datos_vac_val"], sheet_name=2, header=0,  engine='openpyxl', nrows=0)
 
-    datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols = estandarizar_nombres_columnas(datos_via, datos_bit, datos_vac_app, datos_vac_val)
-    name_datos_via_cols_OK, name_datos_bit_cols_OK, name_datos_vac_app_cols_OK, name_datos_vac_val_cols_OK = estandarizar_nombres_columnas(name_datos_via_cols, name_datos_bit_cols, name_datos_vac_app_cols, name_datos_vac_val_cols)
+    datos_base_cols, datos_via_cols, datos_bit_cols, datos_vac_app_cols, datos_vac_val_cols = estandarizar_nombres_columnas(datos_via, datos_bit, datos_vac_app, datos_vac_val)
+    name_datos_base_cols_OK, name_datos_via_cols_OK, name_datos_bit_cols_OK, name_datos_vac_app_cols_OK, name_datos_vac_val_cols_OK = estandarizar_nombres_columnas(name_datos_via_cols, name_datos_bit_cols, name_datos_vac_app_cols, name_datos_vac_val_cols)
 
     print("COMPROBANDO LAS DIFERENCIAS ENTRE LAS COLUMNAS: ")
     print("__________________________________________________________\n")
-    cols_data_via = [col for col in datos_via_cols if col not in name_datos_via_cols_OK]
+    cols_data_base = [col for col in name_datos_base_cols_OK if col not in datos_base_cols]
+    if cols_data_base == []:
+        print("CORRECTO, LOS CAMPOS DE LAS COLUMNAS DEL datos_base COINCIDEN.")
+    else:
+        print("CORREGIR CAMPOS datos_via: ")
+        print("Su fichero contiene las columnas: ", datos_base.columns)
+        print("El fichero deseado contiene las columnas: ", name_datos_base_cols)
+        print("Corrija las siguientes columnas: ", cols_data_base)
+        mensaje_error+="\nBASE columnas mal: "+str(cols_data_base)
+    print("__________________________________________________________\n")
+    cols_data_via = [col for col in name_datos_via_cols_OK if col not in datos_via_cols]
     if cols_data_via == []:
         print("CORRECTO, LOS CAMPOS DE LAS COLUMNAS DEL datos_via COINCIDEN.")
     else:
@@ -63,7 +74,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Corrija las siguientes columnas: ", cols_data_via)
         mensaje_error+="\nVIA columnas mal: "+str(cols_data_via)
     print("__________________________________________________________\n")
-    cols_data_bit = [col for col in datos_bit_cols if col not in name_datos_bit_cols_OK]
+    cols_data_bit = [col for col in name_datos_bit_cols_OK if col not in datos_bit_cols]
     if cols_data_bit == []:
         print("CORRECTO, LOS CAMPOS DE LAS COLUMNAS DEL datos_bit COINCIDEN.")
     else:
@@ -73,7 +84,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Corrija las siguientes columnas: ", cols_data_bit)
         mensaje_error+="\nBIT columnas mal: "+str(cols_data_bit)
     print("__________________________________________________________\n")
-    cols_data_vac_app = [col for col in datos_vac_app_cols if col not in name_datos_vac_app_cols_OK]
+    cols_data_vac_app = [col for col in name_datos_vac_app_cols_OK if col not in datos_vac_app_cols]
     if cols_data_vac_app == []:
         print("CORRECTO, LOS CAMPOS DE LAS COLUMNAS DEL datos_vac_app COINCIDEN.")
     else:
@@ -83,7 +94,7 @@ def comprobar_nombres_columnas(diccionario_archivos):
         print("Corrija las siguientes columnas: ", cols_data_vac_app)
         mensaje_error+="\nVAC_app columnas mal: "+str(cols_data_vac_app)
     print("__________________________________________________________\n")
-    cols_data_vac_val = [col for col in datos_vac_val_cols if col not in name_datos_vac_val_cols_OK]
+    cols_data_vac_val = [col for col in name_datos_vac_val_cols_OK if col not in datos_vac_val_cols]
     if cols_data_vac_val == []:
         print("CORRECTO, LOS CAMPOS DE LAS COLUMNAS DEL datos_vac_val COINCIDEN.")
     else:
