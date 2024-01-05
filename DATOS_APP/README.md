@@ -44,10 +44,11 @@
 - [x] Capturar cualquier error que se produzca
 - [x] Hacer más interactiva la app para que el usuario vea los errores
 - [x] Continuar con el manual de usuario
-## Día [03/04]/01/2024
-- [ ] Hacer script independiente.
+## Día [03/04/05]/01/2024
+- [x] Hacer script independiente.
+- [x] Corregir errores en los nombres de las columnas de la alerta al usuario.
 ## OTROS
-- [ ] Solucionar problemas de ejecucion del archivo Python en ordenadores del consorcio [llamar al equipo técnico, Ann]
+- [x] Solucionar problemas de ejecucion del archivo Python en ordenadores del consorcio [llamar al equipo técnico, Ann]
 - [ ] Empezar con la parte de descuentos???
 ## Apuntes:
 Para generar el ejecutable:
