@@ -13,23 +13,26 @@
 ## ADVERTENCIA:
 El programa puede llegar a tardar 10 minutos en cargar los datos, una vez cargados tiene que pulsar en descargar archivo y guardarlo en el directorio que guste.
 
-## COLUMNAS DE CADA TABLA:
-BASE = ['Idconce', 'Fecha', 'Nexpe', 'Kms', 'Sencillo', 'Indicencia',
-'Gratuitos', 'Recargo', 'Bonobus', 'Abottes', 'Pmun', 'Otros', 'Valman',
-'Total', 'Ingsencillo', 'Ingrecargo', 'Ingtotal', 'Fichero',
-'Fecha Proc']
+## NOMBRES OBLIGATORIOS DE LAS HOJAS A CARGAR
+- BASE = "datos-base"
+- VIA = "datos-via"
+- BIT = "datos-bit"
+- VAC_APP = "datos-Vapp"
+- VAC_VAL = "datos-Vval"
 
-VIA = ['CONCESION', 'FECHA', 'NULINUSER', 'SUBLINEA', 'CODTIT', 'TITULO',
-'IDCODIGOPERFIL', 'CODDES', 'DESCUENTO', 'VALIDACIONES', 'FICHERO','F_PROCESO']
+## COLUMNAS OBLIGATORIAS DE CADA TABLA:
+BASE = ['Idconce', 'Fecha', 'Sencillo', 'Indicencia','Gratuitos', 'Recargo', 'Bonobus', 'Abottes', 'Pmun', 'Otros', 'Valman','Total']
 
-BIT = ['Operador', 'Concesion', 'Periodo', 'Codtit', 'Titulo', 'Subidos']
+VIA = ['CONCESION', 'FECHA', 'NULINUSER', 'SUBLINEA', 'CODTIT', 'CODDES','VALIDACIONES']
 
-VAC_APP = ['Tipo', 'Empresa', 'Concesión/Linea', 'Titulo', 'Dscr Título', 'Fecha',
-'Hora', 'Zona Validación', 'Validaciones']
+BIT = ['Concesion', 'Periodo', 'Codtit', 'Subidos'] (Coddes)
 
-VAC_VAL = ['Empresa', 'Fecha', 'Concesion', 'L Gestra', 'Desclinea', 'P Gestra',
-'Descparada', 'Corona', 'Codtit', 'Titulo', 'Validaciones']
+VAC_APP = ['Concesión/Linea', 'Titulo', 'Fecha','Hora', 'Zona Validación', 'Validaciones']
 
+VAC_VAL = ['Fecha', 'Concesion', 'L Gestra', 'P Gestra','Corona', 'Codtit', 'Validaciones']
+
+## COLUMNAS TABLA FINAL
+[Concesion, Fecha, Codtit, Validaciones, Coddes, Corona]
 
 ---
 

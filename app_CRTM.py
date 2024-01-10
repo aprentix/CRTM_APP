@@ -85,7 +85,7 @@ def main(page: Page):
                 page.banner.open = False
                 snack_bar.open = True
                 page.update()
-                decision_interurbanos_vcm, decision_interurbanos_vac, decision_vacs = sf.programa_final(directorios)
+                decision_interurbanos_vcm, decision_vacs = sf.programa_final(directorios)
                 snack_bar.open = False
                 boton_activado_.disabled = False
                 boton_activado_.update()
@@ -130,7 +130,6 @@ def main(page: Page):
             os.makedirs(directory_path, exist_ok=True)
             with pd.ExcelWriter(file_path) as writer:
                 decision_interurbanos_vcm.to_excel(writer, "interurbanos_vcm")
-                decision_interurbanos_vac.to_excel(writer, "interurbanos_vac")
                 decision_vacs.to_excel(writer, "vacs")
             print("ARCHIVOS CREADOS")
         else:

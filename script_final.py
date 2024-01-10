@@ -28,7 +28,7 @@ def programa_final(diccionario_archivos):
     print("OK BASE")
     interurbanos_vcm, interurbanos_vac, vacs = ssa.lista_final(datos_VIA_OK, datos_VAC_OK, datos_BIT_OK, datos_BASE_OK)
     print("OK LISTAS INICIALES")
-    interurbanos_vcm_decision, interurbanos_vac_decision, vacs_decision = sgf.construir_tabla_decisiones(interurbanos_vcm, interurbanos_vac, vacs)
+    interurbanos_vcm_decision, vacs_decision = sgf.construir_tabla_decisiones(interurbanos_vcm, interurbanos_vac, vacs)
     print("OK LISTAS DECISIONES")
 
-    return interurbanos_vcm_decision, interurbanos_vac_decision, vacs_decision
+    return interurbanos_vcm_decision, vacs_decision
