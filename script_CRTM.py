@@ -30,9 +30,9 @@ def programa_final(diccionario_archivos):
         print("OK VIA")
         datos_BASE_OK = ssa.proceso_base(datos_base)
         print("OK BASE")
-        interurbanos_vcm, interurbanos_vac, vacs = ssa.lista_final(datos_VIA_OK, datos_VAC_OK, datos_BIT_OK, datos_BASE_OK)
+        interurbanos_vcm, vacs = ssa.lista_final(datos_VIA_OK, datos_VAC_OK, datos_BIT_OK, datos_BASE_OK)
         print("OK LISTAS INICIALES")
-        interurbanos_vcm_decision, vacs_decision = sgf.construir_tabla_decisiones(interurbanos_vcm, interurbanos_vac, vacs)
+        interurbanos_vcm_decision, vacs_decision = sgf.construir_tabla_decisiones(interurbanos_vcm, vacs)
         print("OK LISTAS DECISIONES")
 
         return interurbanos_vcm_decision, vacs_decision
@@ -41,24 +41,45 @@ def programa_final(diccionario_archivos):
 
 if __name__ == "__main__":
     directorios = dict()
-    for file_name in sys.argv:
-        if re.search(r".*BIT.*",file_name) != None:
-            directorios['datos_bit']=os.path.abspath(file_name)
-        elif re.search(r".*BASE.*",file_name) != None:
-            directorios['datos_base']=os.path.abspath(file_name)
-        elif re.search(r".*VIA.*",file_name) != None:
-            directorios['datos_via']=os.path.abspath(file_name)
-        elif re.search(r".*Vac_app.*",file_name) != None:
-            directorios['datos_vac_app']=os.path.abspath(file_name)
-        elif re.search(r".*Vac_val.*",file_name) != None:
-            directorios['datos_vac_val']=os.path.abspath(file_name)
-    if len(directorios)==5:
-        try:
-            interurbanos_vcm_decision, vacs_decision = programa_final(directorios)
-            archive_name = str(input("---- Inserte el nombre del archivo: "))
-            with pd.ExcelWriter("./"+archive_name+".xlsx", engine="openpyxl") as writer:
-                interurbanos_vcm_decision.to_excel(writer, "interurbanos_vcm")
-                vacs_decision.to_excel(writer, "vacs")
-            print("ARCHIVO CREADO")
-        except Exception as e:
-            print("ERROR CREACION ARCHIVO: ", e)
+    anyo = str(input("---- Inserte el año: "))
+    mes = str(input("---- Inserte el mes: "))
+    try:
+        mylist = [os.path.abspath("./"+anyo+"-"+mes+"/"+x) for x in os.listdir("./"+anyo+"-"+mes+"/")]
+        print(mylist)
+        for file_name in mylist:
+            if re.search(r".*BIT.*",file_name) != None:
+                directorios['datos_bit']=os.path.abspath(file_name)
+            elif re.search(r".*BASE.*",file_name) != None:
+                directorios['datos_base']=os.path.abspath(file_name)
+            elif re.search(r".*VIA.*",file_name) != None:
+                directorios['datos_via']=os.path.abspath(file_name)
+            elif re.search(r".*Vac_app.*",file_name) != None:
+                directorios['datos_vac_app']=os.path.abspath(file_name)
+            elif re.search(r".*Vac_val.*",file_name) != None:
+                directorios['datos_vac_val']=os.path.abspath(file_name)
+        if len(directorios)==5:
+            try:
+                interurbanos_vcm_decision, vacs_decision = programa_final(directorios)
+                archive_name = str(input("---- Inserte el nombre del archivo: "))
+                with pd.ExcelWriter("./"+anyo+"-"+mes+"/"+archive_name+".xlsx", engine="openpyxl") as writer:
+                    interurbanos_vcm_decision.to_excel(writer, "interurbanos_vcm")
+                    vacs_decision.to_excel(writer, "vacs")
+                print("ARCHIVO CREADO")
+            except Exception as e:
+                print("ERROR CREACION ARCHIVO: ", e)
+    except FileNotFoundError:
+        print("---- No existe el directorio "+anyo+"-"+mes)
+    
+    
+    # for file_name in sys.argv:
+    #     if re.search(r".*BIT.*",file_name) != None:
+    #         directorios['datos_bit']=os.path.abspath(file_name)
+    #     elif re.search(r".*BASE.*",file_name) != None:
+    #         directorios['datos_base']=os.path.abspath(file_name)
+    #     elif re.search(r".*VIA.*",file_name) != None:
+    #         directorios['datos_via']=os.path.abspath(file_name)
+    #     elif re.search(r".*Vac_app.*",file_name) != None:
+    #         directorios['datos_vac_app']=os.path.abspath(file_name)
+    #     elif re.search(r".*Vac_val.*",file_name) != None:
+    #         directorios['datos_vac_val']=os.path.abspath(file_name)
+    

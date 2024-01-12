@@ -50,37 +50,6 @@ def assign_categorie_interurbanos_vcm(x):
                 return pd.Series(["SIN CRITERIO",""])
     else:
         return pd.Series(["CE",""])
-    
-'''  INTERURBANOS VAC
-Los filtros:
-1. No tiene Base en la columna decisión => VAC, ""
-2. else:
-    2.1. if 0.005<VAC/BASE<1.005
-        2.1.1 if 0.005>BIT/VAC>1.005 => VAC, ""
-        2.1.2 else => VAC, "error BIT"
-    2.2. else
-        2.2.1 0.005<BIT/VAC<1.005 => VAC, "error BASE"
-        2.2.2 else => BIT, "Sin criterio"
-
-'''
-'''  INTERURBANOS VAC
-'VAC/BASE', 'BIT/VAC'
-'''
-## para las interurbano_VACS
-def assign_categorie_interurbanos_vacs(x): 
-    if x["BASE"]==0:
-        return pd.Series(["VAC", ""])
-    else:
-        if 0.005<x["VAC/BASE"]<1.005:
-            if 0.005>x["BIT/VAC"]>1.005:
-                return pd.Series(["VAC", ""])
-            else:
-                return pd.Series(["VAC", "error BIT"])
-        else:
-            if 0.005<x["BIT/VAC"]<1.005:
-                return pd.Series(["VAC", "error BASE"])
-            else:
-                return pd.Series(["BIT", "Sin criterio"])
 
 ### VACs
 # BASE-VIA = BASE-VIA
@@ -92,6 +61,11 @@ amarillo: not -0.005<x["%DIF/BASE"]<0.005
 verde: entre 0.995<x["%VAC/VIA"]<1.005
 morado: entre x["VAC"]*0.99<x["BIT"]<x["VAC"]*1.01
 '''
+lista_vacs_interurbano = ['V5805','VAC-023',
+    'VAC-051','VAC-063','VAC-082','VAC-087',
+    'VAC-093','VAC-152','VAC-158','VAC-221',
+    'VAC-226','VAC-231','VAC-243','VAC-249']
+
 def assign_categorie_vacs(x):
     if x["VIA"]==0:
         return pd.Series(["VAC",""])
@@ -114,14 +88,19 @@ def assign_categorie_vacs(x):
     else:
         return pd.Series(["CE","CE"])
 
-def construir_tabla_decisiones(interurbanos_vcm, interurbanos_vac, vacs):
+def construir_tabla_decisiones(interurbanos_vcm, vacs):
     interurbanos_vcm.rename({"Concesion":"CONCESION", "Total_VIA":"VIA","Total_BIT":"BIT","Total_BASE":"BASE"}, axis=1 , inplace=True)
-    interurbanos_vac.rename({"Concesion":"CONCESION", "Total_VIA":"VIA","Total_BIT":"BIT","Total_BASE":"BASE", "Total_VAC":"VAC"}, axis=1 , inplace=True)
     vacs.rename({"Concesion":"CONCESION","Total_VIA":"VIA", "Total_VAC":"VAC","Total_BIT":"BIT","Total_BASE":"BASE"}, axis=1 , inplace=True)
-    
+    ## LOGICA ANTIGUA
+    # interurbanos_vcm["BASE-VIA"] = interurbanos_vcm["BASE"]-interurbanos_vcm["VIA"]
+    # interurbanos_vcm["%DIF/BASE"] = (interurbanos_vcm["BASE-VIA"]/interurbanos_vcm["BASE"])*100
+    # interurbanos_vcm["BIT-BASE"] = interurbanos_vcm["BIT"]-interurbanos_vcm["BASE"]
+    # interurbanos_vcm["%BIT/BASE"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["BASE"])*100
+    # interurbanos_vcm["%BIT/VIA"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["VIA"])*100
+    ## LOGICA NUEVA
     interurbanos_vcm["BASE-VIA"] = interurbanos_vcm["BASE"]-interurbanos_vcm["VIA"]
     interurbanos_vcm["%DIF/BASE"] = (interurbanos_vcm["BASE-VIA"]/interurbanos_vcm["BASE"])*100
-    interurbanos_vcm["BIT-BASE"] = interurbanos_vcm["BIT"]-interurbanos_vcm["BASE"]
+    interurbanos_vcm["BASE-BIT"] = interurbanos_vcm["BASE"]-interurbanos_vcm["BIT"]
     interurbanos_vcm["%BIT/BASE"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["BASE"])*100
     interurbanos_vcm["%BIT/VIA"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["VIA"])*100
     interurbanos_vcm[["DECISION","ACCION"]] = interurbanos_vcm.apply(assign_categorie_interurbanos_vcm, axis=1)
@@ -147,6 +126,5 @@ def construir_tabla_decisiones(interurbanos_vcm, interurbanos_vac, vacs):
     vacs[["DECISION","ACCION"]] = vacs.apply(assign_categorie_vacs, axis=1)
     print("------------- VACs /// ", vacs.columns)
     print("////// INTERURBANOS VCM /// ", interurbanos_vcm.columns)
-    print("////// INTERURBANOS VAC /// ", interurbanos_vac.columns)
     print("////// VACs /// ", vacs.columns)
     return interurbanos_vcm, vacs

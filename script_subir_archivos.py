@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from exceptions_app import *
 
 ## COLUMNAS ESTANDAR
@@ -18,18 +19,18 @@ types_vac_val_cols = {'Concesion':'str', 'L Gestra':"str", 'P Gestra':"str",'Cor
 
 def leer_archivos(diccionario_archivos):
     try:
-        datos_base = pd.read_excel(diccionario_archivos["datos_base"], sheet_name="datos-base",  usecols=name_datos_base_cols, nrows=1000, dtype= types_base_cols, date_format="%m/%Y", parse_dates=["Fecha"])
-        datos_via = pd.read_excel(diccionario_archivos["datos_via"], sheet_name="datos-via", usecols=name_datos_via_cols, nrows=1000, dtype= types_via_cols, date_format="%d/%m/%Y", parse_dates=["Fecha"])
+        datos_base = pd.read_excel(diccionario_archivos["datos_base"], sheet_name="datos-base",  usecols=name_datos_base_cols, dtype= types_base_cols, date_format="%m/%Y", parse_dates=["Fecha"])
+        datos_via = pd.read_excel(diccionario_archivos["datos_via"], sheet_name="datos-via", usecols=name_datos_via_cols, dtype= types_via_cols, date_format="%d/%m/%Y", parse_dates=["Fecha"])
         datos_bit = pd.read_excel(diccionario_archivos["datos_bit"], sheet_name="datos-bit",  nrows=0)
         if "Coddes" not in datos_bit.columns:
-            datos_bit = pd.read_excel(diccionario_archivos["datos_bit"], sheet_name="datos-bit",  usecols=name_datos_bit_cols[:-1], nrows=1000, dtype= types_bit_cols, date_format="%m/%Y", parse_dates=["Periodo"])
+            datos_bit = pd.read_excel(diccionario_archivos["datos_bit"], sheet_name="datos-bit",  usecols=name_datos_bit_cols[:-1], dtype= types_bit_cols, date_format="%m/%Y", parse_dates=["Periodo"])
             datos_bit["Coddes"] = ""
         else:
-            datos_bit = pd.read_excel(diccionario_archivos["datos_bit"], sheet_name="datos-bit",  usecols=name_datos_bit_cols, nrows=1000, dtype= types_bit_cols, date_format="%m/%Y", parse_dates=["Periodo"])
+            datos_bit = pd.read_excel(diccionario_archivos["datos_bit"], sheet_name="datos-bit",  usecols=name_datos_bit_cols, dtype= types_bit_cols, date_format="%m/%Y", parse_dates=["Periodo"])
 
-        datos_vac_val = pd.read_excel(diccionario_archivos["datos_vac_val"], sheet_name="datos-Vval", usecols=name_datos_vac_val_cols, nrows=1000, dtype=types_vac_val_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
-        datos_vac_app = pd.read_excel(diccionario_archivos["datos_vac_app"], sheet_name="datos-Vapp", usecols=name_datos_vac_app_cols, nrows=1000, dtype=types_vac_app_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
-
+        datos_vac_val = pd.read_excel(diccionario_archivos["datos_vac_val"], sheet_name="datos-Vval", usecols=name_datos_vac_val_cols, dtype=types_vac_val_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
+        datos_vac_app = pd.read_excel(diccionario_archivos["datos_vac_app"], sheet_name="datos-Vapp", usecols=name_datos_vac_app_cols, dtype=types_vac_app_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
+        datos_vac_app['Zona Validación'] = datos_vac_app['Zona Validación'].apply(lambda x: re.findall('\w+', x)[1])
         return datos_base, datos_via, datos_bit, datos_vac_app, datos_vac_val
     except Exception as e:
         print(str(e))
@@ -159,17 +160,17 @@ def procesar_via(datos_via):
 ## proceso el BASE
 def proceso_base(datos_base):
     datos_base.Fecha = datos_base.Fecha.dt.to_period("M")
-    print(datos_base.dtypes)
     datos_base.rename(columns={"Idconce":"Concesion","Fecha":"Mes","Total":"Total_BASE"}, inplace=True)
     return datos_base[["Concesion","Mes","Total_BASE"]]
 
 ## tabla union de todos los totales VIA, VAC, BIT
 def lista_final(month_datos_via_export, month_datos_vac_export, month_datos_bit_export, datos_base_ok):
-    print("VIA:\n", month_datos_via_export.dtypes)
-    print("VAC:\n", month_datos_vac_export.dtypes)
-    print("BIT:\n", month_datos_bit_export.dtypes)
-    print("BASE:\n", datos_base_ok.dtypes)
+    # print("VIA:\n", month_datos_via_export.dtypes)
+    # print("VAC:\n", month_datos_vac_export.dtypes)
+    # print("BIT:\n", month_datos_bit_export.dtypes)
+    # print("BASE:\n", datos_base_ok.dtypes)
     lista_concat = ['Concesion', 'Mes']
+    lista_interubanos_vcm = ['U0058', 'URCM-005', 'URCM-013', 'URCM-014', 'URCM-148', 'URCM-152', 'URCM-161', 'VCM-101', 'VCM-102', 'VCM-103', 'VCM-200', 'VCM-201', 'VCM-202', 'VCM-203', 'VCM-204', 'VCM-301', 'VCM-302', 'VCM-303', 'VCM-401', 'VCM-402', 'VCM-403', 'VCM-404', 'VCM-500', 'VCM-501', 'VCM-502', 'VCM-503', 'VCM-504', 'VCM-600', 'VCM-601', 'VCM-602', 'VCM-603', 'VCM-604', 'VCM-605', 'VCM-606', 'VCM-607', 'VCM-701', 'VCM-702']
     lista_vacs_interurbano = ['V5805','VAC-023',
     'VAC-051','VAC-063','VAC-082','VAC-087',
     'VAC-093','VAC-152','VAC-158','VAC-221',
@@ -186,12 +187,10 @@ def lista_final(month_datos_via_export, month_datos_vac_export, month_datos_bit_
     lista_totales_union_VACs = lista_totales_union_VACs[(lista_totales_union_VACs.Concesion != "-") & (lista_totales_union_VACs.Concesion != "97")]
     
     lista_totales_union_INTERURBANOS_VCM = lista_totales_union_INTERURBANOS[~lista_totales_union_INTERURBANOS['Concesion'].isin(lista_vacs_interurbano)]
-    lista_totales_union_INTERURBANOS_VAC = lista_totales_union_INTERURBANOS[lista_totales_union_INTERURBANOS['Concesion'].isin(lista_vacs_interurbano)]
+    agregar_interurbano_vcm = [i for i in lista_interubanos_vcm if i not in list(lista_totales_union_INTERURBANOS_VCM.Concesion)]
+    lista_totales_union_INTERURBANOS_VCM = pd.concat([lista_totales_union_INTERURBANOS_VCM, pd.DataFrame(agregar_interurbano_vcm, columns=["Concesion"])], axis=0)
 
-    lista_totales_union_INTERURBANOS_VAC = pd.merge(lista_totales_union_INTERURBANOS_VAC, lista_totales_union_VACs, how="left")
     print("////// INTERURBANOS VCM/// ", lista_totales_union_INTERURBANOS_VCM.columns)
-    print("////// INTERURBANOS VAC/// ", lista_totales_union_INTERURBANOS_VAC.columns)
-
     print("////// VACs /// ", lista_totales_union_VACs.columns)
 
-    return lista_totales_union_INTERURBANOS_VCM, lista_totales_union_INTERURBANOS_VAC, lista_totales_union_VACs
+    return lista_totales_union_INTERURBANOS_VCM, lista_totales_union_VACs
