@@ -50,6 +50,9 @@
 ## OTROS
 - [x] Solucionar problemas de ejecucion del archivo Python en ordenadores del consorcio [llamar al equipo técnico, Ann]
 - [ ] Empezar con la parte de descuentos???
+
+## Corregir
+- [ ] Corregir lo de los interurbanos que aparezcan sow
 ## Apuntes:
 Para generar el ejecutable:
 > flet pack app_CRTM.py --add-data ".\images\CRTM_LOGO.png;.\images" --add-data ".\MANUAL.md;." --icon ".\images\CRTM_LOGO.png"

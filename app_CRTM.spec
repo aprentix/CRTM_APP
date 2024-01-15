@@ -34,6 +34,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    version='C:\\Users\\ray\\AppData\\Local\\Temp\\2e2c4317-eb30-4b27-8b31-59ad140007ff',
+    version='C:\\Users\\ray\\AppData\\Local\\Temp\\adec1bbc-d83c-4974-86b5-5f45df0c4e2a',
     icon=['images\\CRTM_LOGO.png'],
 )

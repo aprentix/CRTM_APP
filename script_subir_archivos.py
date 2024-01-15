@@ -170,25 +170,33 @@ def lista_final(month_datos_via_export, month_datos_vac_export, month_datos_bit_
     # print("BIT:\n", month_datos_bit_export.dtypes)
     # print("BASE:\n", datos_base_ok.dtypes)
     lista_concat = ['Concesion', 'Mes']
-    lista_interubanos_vcm = ['U0058', 'URCM-005', 'URCM-013', 'URCM-014', 'URCM-148', 'URCM-152', 'URCM-161', 'VCM-101', 'VCM-102', 'VCM-103', 'VCM-200', 'VCM-201', 'VCM-202', 'VCM-203', 'VCM-204', 'VCM-301', 'VCM-302', 'VCM-303', 'VCM-401', 'VCM-402', 'VCM-403', 'VCM-404', 'VCM-500', 'VCM-501', 'VCM-502', 'VCM-503', 'VCM-504', 'VCM-600', 'VCM-601', 'VCM-602', 'VCM-603', 'VCM-604', 'VCM-605', 'VCM-606', 'VCM-607', 'VCM-701', 'VCM-702']
+    lista_interubanos_vcm = ['U0058', 'URCM-005',
+    'URCM-013', 'URCM-014', 'URCM-148', 'URCM-152', 
+    'URCM-161', 'VCM-101', 'VCM-102', 'VCM-103', 
+    'VCM-200', 'VCM-201', 'VCM-202', 'VCM-203', 
+    'VCM-204', 'VCM-301', 'VCM-302', 'VCM-303', 
+    'VCM-401', 'VCM-402', 'VCM-403', 'VCM-404', 
+    'VCM-500', 'VCM-501', 'VCM-502', 'VCM-503', 
+    'VCM-504', 'VCM-600', 'VCM-601', 'VCM-602', 
+    'VCM-603', 'VCM-604', 'VCM-605', 'VCM-606', 
+    'VCM-607', 'VCM-701', 'VCM-702']
     lista_vacs_interurbano = ['V5805','VAC-023',
     'VAC-051','VAC-063','VAC-082','VAC-087',
     'VAC-093','VAC-152','VAC-158','VAC-221',
     'VAC-226','VAC-231','VAC-243','VAC-249']
-    lista_totales_union_INTERURBANOS = pd.merge(pd.merge(month_datos_via_export, month_datos_bit_export, on=lista_concat, how="left"),datos_base_ok, on=lista_concat, how="left")
+    lista_totales_union_INTERURBANOS = pd.merge(pd.merge(month_datos_via_export, month_datos_bit_export, on=lista_concat, how="outer"),datos_base_ok, on=lista_concat, how="outer")
     lista_totales_union_INTERURBANOS.rename({"Total_x":"Total_via", "Total_y":"Total_bit", "Total":"Total_BASE"}, axis=1, inplace=True)
     lista_totales_union_INTERURBANOS.drop(["Mes"], axis=1, inplace=True)
 
-    lista_totales_union_VACs = pd.merge(pd.merge(pd.merge(month_datos_vac_export, month_datos_bit_export, on=lista_concat, how="left"),datos_base_ok, on=lista_concat, how="left"), month_datos_via_export, on=lista_concat, how="left")
+    lista_totales_union_VACs = pd.merge(pd.merge(pd.merge(month_datos_vac_export, month_datos_bit_export, on=lista_concat, how="outer"),datos_base_ok, on=lista_concat, how="outer"), month_datos_via_export, on=lista_concat, how="outer")
     lista_totales_union_VACs.rename({"Total_x":"Total_via", "Total_y":"Total_bit", "Total":"Total_BASE"}, axis=1, inplace=True)
     lista_totales_union_VACs.drop(["Mes"], axis=1, inplace=True)
 
     lista_totales_union_INTERURBANOS = lista_totales_union_INTERURBANOS[(lista_totales_union_INTERURBANOS.Concesion != "-") & (lista_totales_union_INTERURBANOS.Concesion != "97")]
     lista_totales_union_VACs = lista_totales_union_VACs[(lista_totales_union_VACs.Concesion != "-") & (lista_totales_union_VACs.Concesion != "97")]
     
-    lista_totales_union_INTERURBANOS_VCM = lista_totales_union_INTERURBANOS[~lista_totales_union_INTERURBANOS['Concesion'].isin(lista_vacs_interurbano)]
-    agregar_interurbano_vcm = [i for i in lista_interubanos_vcm if i not in list(lista_totales_union_INTERURBANOS_VCM.Concesion)]
-    lista_totales_union_INTERURBANOS_VCM = pd.concat([lista_totales_union_INTERURBANOS_VCM, pd.DataFrame(agregar_interurbano_vcm, columns=["Concesion"])], axis=0)
+    lista_totales_union_VACs = lista_totales_union_VACs[lista_totales_union_VACs['Concesion'].isin(lista_vacs_interurbano)]
+    lista_totales_union_INTERURBANOS_VCM = lista_totales_union_INTERURBANOS[lista_totales_union_INTERURBANOS['Concesion'].isin(lista_interubanos_vcm)]
 
     print("////// INTERURBANOS VCM/// ", lista_totales_union_INTERURBANOS_VCM.columns)
     print("////// VACs /// ", lista_totales_union_VACs.columns)

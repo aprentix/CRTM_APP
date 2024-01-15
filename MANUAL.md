@@ -2,13 +2,13 @@
 
 ## REQUISITOS:
 - Los archivos tienen que tener el nombre original de descarga y no han de tener las hojas en orden modificado. Todos han de pertenecer al mismo mes. 
-- Ejemplo para el mes 09 :
-    - BASE: "2023-09 DATOS_BASE.xlsx"
-    - VIA: "2023-09 DATOS_VIA.xlsx"
-    - BIT: "2023-09 InformeBIT.xlsx"
-    - VAC_APP: "2023-09Vac_app.xlsx"
-    - VAC_VAL: "2023-09Vac_val.xlsx"
-- Las columnas de cada archivo:
+
+## NOMBRES DE LAS HOJAS A CARGAR
+- BASE = "DATOS_BASE"
+- VIA = "DATOS_VIA"
+- BIT = "BIT"
+- VAC_APP = "Vac_app"
+- VAC_VAL = "Vac_val"
 
 ## ADVERTENCIA:
 El programa puede llegar a tardar 10 minutos en cargar los datos, una vez cargados tiene que pulsar en descargar archivo y guardarlo en el directorio que guste.
@@ -23,13 +23,14 @@ El programa puede llegar a tardar 10 minutos en cargar los datos, una vez cargad
 ## COLUMNAS OBLIGATORIAS DE CADA TABLA:
 BASE = ['Idconce', 'Fecha', 'Sencillo', 'Indicencia','Gratuitos', 'Recargo', 'Bonobus', 'Abottes', 'Pmun', 'Otros', 'Valman','Total']
 
-VIA = ['CONCESION', 'FECHA', 'NULINUSER', 'SUBLINEA', 'CODTIT', 'CODDES','VALIDACIONES']
+VIA = ['Concesion', 'Fecha', 'Nulinuser', 'Sublinea', 'Codtit', 'Coddes', 'Validaciones']
 
-BIT = ['Concesion', 'Periodo', 'Codtit', 'Subidos'] (Coddes)
+BIT = ['Concesion', 'Periodo', 'Codtit', 'Subidos', 'Coddes']
 
 VAC_APP = ['Concesión/Linea', 'Titulo', 'Fecha','Hora', 'Zona Validación', 'Validaciones']
 
 VAC_VAL = ['Fecha', 'Concesion', 'L Gestra', 'P Gestra','Corona', 'Codtit', 'Validaciones']
+
 
 ## COLUMNAS TABLA FINAL
 [Concesion, Fecha, Codtit, Validaciones, Coddes, Corona]

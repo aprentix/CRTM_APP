@@ -47,6 +47,7 @@ if __name__ == "__main__":
         mylist = [os.path.abspath("./"+anyo+"-"+mes+"/"+x) for x in os.listdir("./"+anyo+"-"+mes+"/")]
         print(mylist)
         for file_name in mylist:
+            print(file_name)
             if re.search(r".*BIT.*",file_name) != None:
                 directorios['datos_bit']=os.path.abspath(file_name)
             elif re.search(r".*BASE.*",file_name) != None:
@@ -57,6 +58,7 @@ if __name__ == "__main__":
                 directorios['datos_vac_app']=os.path.abspath(file_name)
             elif re.search(r".*Vac_val.*",file_name) != None:
                 directorios['datos_vac_val']=os.path.abspath(file_name)
+        print("CARGADOS\n", directorios)
         if len(directorios)==5:
             try:
                 interurbanos_vcm_decision, vacs_decision = programa_final(directorios)
@@ -67,6 +69,8 @@ if __name__ == "__main__":
                 print("ARCHIVO CREADO")
             except Exception as e:
                 print("ERROR CREACION ARCHIVO: ", e)
+        else:
+            print("Cargue todos los archivos necesarios.")
     except FileNotFoundError:
         print("---- No existe el directorio "+anyo+"-"+mes)
     
