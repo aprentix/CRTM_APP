@@ -124,17 +124,20 @@ def main(page: Page):
         global decision_interurbanos_vcm, decision_interurbanos_vac, decision_vacs
         file_path = e.path+".xlsx"
         print(str(file_path))
-        if file_path:
-            directory_path = os.path.dirname(file_path)
-            save_file_path.value = directory_path if e.path else "Descarga cancelada"
-            os.makedirs(directory_path, exist_ok=True)
-            with pd.ExcelWriter(file_path) as writer:
-                decision_interurbanos_vcm.to_excel(writer, "interurbanos_vcm")
-                decision_vacs.to_excel(writer, "vacs")
-            print("ARCHIVOS CREADOS")
-        else:
-            print("NO PATH SELECTED")  
-        save_file_path.update()
+        try:
+            if file_path:
+                directory_path = os.path.dirname(file_path)
+                save_file_path.value = directory_path if e.path else "Descarga cancelada"
+                os.makedirs(directory_path, exist_ok=True)
+                with pd.ExcelWriter(file_path) as writer:
+                    decision_interurbanos_vcm.to_excel(writer, "interurbanos_vcm", index_label=None)
+                    decision_vacs.to_excel(writer, "vacs")
+                print("ARCHIVOS CREADOS")
+            else:
+                print("NO PATH SELECTED")  
+            save_file_path.update()
+        except Exception as e:
+            raise
 
     save_file_dialog = FilePicker(on_result=save_file_result)
     save_file_path = Text()
