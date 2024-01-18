@@ -9,7 +9,6 @@ name_datos_bit_cols = ['Concesion', 'Periodo', 'Codtit', 'Subidos', 'Coddes']
 name_datos_vac_app_cols = ['Concesión/Linea', 'Titulo', 'Fecha','Hora', 'Zona Validación', 'Validaciones']
 name_datos_vac_val_cols = ['Fecha', 'Concesion', 'L Gestra', 'P Gestra','Corona', 'Codtit', 'Validaciones']
 
-fin_datos_via_cols = ['Concesion', 'Fecha', 'Codtit', 'Validaciones', 'Coddes']
 
 types_base_cols = {'Idconce':'str', 'Sencillo':"int64", 'Indicencia':"int64",'Gratuitos':"int64", 'Recargo':"int64", 'Bonobus':"int64", 'Abottes':"int64", 'Pmun':"int64", 'Otros':"int64", 'Valman':"str",'Total':"int64"}
 types_via_cols = {'Concesion':'str', 'Nulinuser':"str", 'Sublinea':"str", 'Codtit':"int64", 'Coddes':"str", 'Validaciones':"int64"}
@@ -31,9 +30,7 @@ def leer_archivos(diccionario_archivos):
         datos_bit.Periodo = pd.to_datetime(datos_bit.Periodo, format="%m/%Y")
         if datos_bit.Periodo.dtypes == "datetime64[ns]":
             datos_bit.Periodo = datos_bit.Periodo.dt.to_period("M")
-        datos_bit.to_excel("./pruebas_out_app/datos_bit.xlsx", index=False)
         datos_via.Fecha = pd.to_datetime(datos_via.Fecha, format="%d/%m/%Y").dt.date
-        datos_via[fin_datos_via_cols].to_excel("./pruebas_out_app/datos_via.xlsx", index=False)
         datos_vac_val = pd.read_excel(diccionario_archivos["datos_vac_val"], sheet_name="datos-Vval", usecols=name_datos_vac_val_cols, dtype=types_vac_val_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
         datos_vac_app = pd.read_excel(diccionario_archivos["datos_vac_app"], sheet_name="datos-Vapp", usecols=name_datos_vac_app_cols, dtype=types_vac_app_cols , date_format="%d/%m/%Y", parse_dates=["Fecha"])
         datos_vac_app['Zona Validación'] = datos_vac_app['Zona Validación'].apply(lambda x: re.findall('\w+', x)[1])
@@ -133,8 +130,7 @@ def procesar_vac_app(datos_vac_val, datos_vac_app):
     print("VAC_VAL:\n", datos_vac_val.dtypes)
     print("VAC_APP:\n", datos_vac_app.dtypes)
     day_datos_vac_val_export = datos_vac_val.groupby(["Concesion", "Fecha", "Codtit"])["Validaciones"].sum().reset_index(name="Total_VAC")
-    day_datos_vac_app_export = datos_vac_app.groupby(["Concesión/Linea", "Fecha", "Titulo"])["Validaciones"].sum().reset_index(name="Total_VAC")
-    day_datos_vac_app_export.rename({"Concesión/Linea":"Concesion", "Titulo":"Codtit"}, axis=1, inplace=True)
+    day_datos_vac_app_export = datos_vac_app.groupby(["Concesion", "Fecha", "Codtit"])["Validaciones"].sum().reset_index(name="Total_VAC")
     day_datos_vac_export = pd.concat([day_datos_vac_val_export, day_datos_vac_app_export], axis=0)
     month_datos_vac_export = day_datos_vac_export
     if month_datos_vac_export.Fecha.dtypes == "datetime64[ns]":
@@ -143,12 +139,12 @@ def procesar_vac_app(datos_vac_val, datos_vac_app):
     return month_datos_vac_export.groupby(["Concesion", "Mes"])["Total"].sum().reset_index(name="Total_VAC")
 ## procesamos el BIT
 def procesar_bit(datos_bit):
-    month_datos_bit_export = datos_bit.groupby(["Concesion", "Periodo", "Codtit"])["Subidos"].sum().reset_index(name="Total_BIT")
-    #month_datos_bit_export.Periodo = pd.to_datetime(month_datos_bit_export.Periodo, format="%m/%Y")
-    if month_datos_bit_export.Periodo.dtypes == "datetime64[ns]":
-        month_datos_bit_export.Periodo = month_datos_bit_export.Periodo.dt.to_period("M")
+    month_datos_bit_export = datos_bit.groupby(["Concesion", "Fecha", "Codtit"])["Validaciones"].sum().reset_index(name="Total_BIT")
+    #month_datos_bit_export.Fecha = pd.to_datetime(month_datos_bit_export.Fecha, format="%m/%Y")
+    if month_datos_bit_export.Fecha.dtypes == "datetime64[ns]":
+        month_datos_bit_export.Fecha = month_datos_bit_export.Fecha.dt.to_period("M")
     month_datos_bit_export.columns
-    month_datos_bit_export.rename({"Periodo":"Mes", "Total_BIT":"Total"}, axis=1, inplace=True)
+    month_datos_bit_export.rename({"Fecha":"Mes", "Total_BIT":"Total"}, axis=1, inplace=True)
     return month_datos_bit_export.groupby(["Concesion", "Mes"])["Total"].sum().reset_index(name="Total_BIT")
 ## procesamos el VIA
 def procesar_via(datos_via):
@@ -207,3 +203,14 @@ def lista_final(month_datos_via_export, month_datos_vac_export, month_datos_bit_
     print("////// INTERURBANOS VCM/// ", lista_totales_union_INTERURBANOS_VCM.columns)
     print("////// VACs /// ", lista_totales_union_VACs.columns)
     return lista_totales_union_INTERURBANOS_VCM, lista_totales_union_VACs
+
+def tablas_finales_bit_via_vac(datos_via, datos_bit, datos_vac_app, datos_vac_val):
+    columnas_finales_vcm = ['Concesion', 'Fecha', 'Codtit', 'Validaciones', 'Coddes']
+    columnas_vacs = ['Concesion','Fecha', 'Corona', 'Codtit', 'Validaciones']
+    datos_bit.rename({'Periodo':"Fecha", 'Subidos':'Validaciones'}, inplace=True, axis='columns')
+    if 'Coddes' not  in datos_bit.columns:
+        datos_bit["Coddes"]=""
+    datos_vac_app.rename({'Concesión/Linea':"Concesion",'Titulo':"Codtit", 'Zona Validación':"Corona"}, inplace=True, axis='columns')
+    
+    vacs = pd.concat([datos_vac_app[columnas_vacs], datos_vac_val[columnas_vacs]], axis=0)
+    return datos_via[columnas_finales_vcm], datos_bit[columnas_finales_vcm], vacs

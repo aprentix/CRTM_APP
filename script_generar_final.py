@@ -147,10 +147,10 @@ def contruir_tabla_final_vacs(vacs_decision, vacs):
         finaldf = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Coddes","Validaciones"])
         for registro in vacs_decision.iterrows():
             registro = registro[1]
-            if registro["DECISION"] == "VIA":
+            if registro["DECISION"] == "VAC":
                 finaldf = pd.concat([finaldf, vacs[vacs["Concesion"]==registro["CONCESION"]]], axis=0)
                 finaldf.Fecha = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
-            elif registro["DECISION"] == "VIA+Reg. Base":
+            elif registro["DECISION"] == "VAC+Reg. Base":
                 new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Coddes"])
                 new_df = vacs[vacs["Concesion"]==registro["CONCESION"]]
                 decision_inter = vacs_decision[vacs_decision["CONCESION"]==registro["CONCESION"]]
