@@ -45,3 +45,4 @@ Herramienta desarrollada para el departamento Comercial del CRTM en diciembre de
 Desarrollo: Raquel DC (becaria) bajo la supervisión e instrucciones de Óscar Barrientos García.
 
 Codigo en: https://github.com/aprentix/CRTM privado o en los archivos del Consorcio.
+Manual usuario APP: https://docs.google.com/document/d/1OxDYcsYn9UWq-GU2fweTsBBJ5eM-45skSWKJ__kvl0s/edit?usp=sharing

@@ -213,4 +213,8 @@ def tablas_finales_bit_via_vac(datos_via, datos_bit, datos_vac_app, datos_vac_va
     datos_vac_app.rename({'Concesión/Linea':"Concesion",'Titulo':"Codtit", 'Zona Validación':"Corona"}, inplace=True, axis='columns')
     
     vacs = pd.concat([datos_vac_app[columnas_vacs], datos_vac_val[columnas_vacs]], axis=0)
-    return datos_via[columnas_finales_vcm], datos_bit[columnas_finales_vcm], vacs
+    datos_bit["Origen"] = ""
+    datos_via["Origen"] = ""
+    vacs["Origen"] = ""
+    vacs.Fecha = pd.to_datetime(vacs.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
+    return datos_via[columnas_finales_vcm], datos_bit[columnas_finales_vcm], vacs[columnas_vacs]

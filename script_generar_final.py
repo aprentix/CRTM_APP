@@ -1,5 +1,6 @@
 import pandas as pd
 import math
+from datetime import datetime
 ### INTERURBANOS VCM
 # BASE-VIA = BASE-VIA
 # %DIF/BASE = ((BASE-VIA)/BASE)
@@ -17,7 +18,7 @@ Y BLANCO - not 0.995<BIT/BASE<1.005
 '''
 # "BASE-VIA" "%DIF/BASE" "BASE-BIT" "%BIT/BASE" "%BIT/VIA"
 def assign_categorie_interurbanos_vcm(x): 
-    resultado = ["ERROR", "ERROR"]
+    resultado = ["BIT (sin via-base)", "Solo tiene BIT"]
     if 0.995<x["BASE/VIA"]<1.005: # (UNO BLANCO)
         if 0.995<x["%BIT/VIA"]<1.005: # (UNO BLANCO, A VERDE)
             if x["BASE-VIA"]>0:
@@ -86,7 +87,6 @@ def construir_tabla_decisiones(interurbanos_vcm, vacs):
 # BASE-BIT = BASE-BIT
     interurbanos_vcm["BASE-VIA"] = interurbanos_vcm["BASE"]-interurbanos_vcm["VIA"]
     interurbanos_vcm["BASE/VIA"] = interurbanos_vcm["BASE"]/interurbanos_vcm["VIA"]
-    #interurbanos_vcm["%DIF/BASE"] = (interurbanos_vcm["BASE-VIA"]/interurbanos_vcm["BASE"])
     interurbanos_vcm["BASE-BIT"] = interurbanos_vcm["BASE"]-interurbanos_vcm["BIT"]
     interurbanos_vcm["%BIT/BASE"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["BASE"])
     interurbanos_vcm["%BIT/VIA"] = (interurbanos_vcm["BIT"]/interurbanos_vcm["VIA"])
@@ -106,60 +106,75 @@ def construir_tabla_decisiones(interurbanos_vcm, vacs):
     return interurbanos_vcm, vacs
 
 def contruir_tabla_final_interubanos(decision_interurbanos, via, bit):
-    try:
-        finaldf = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Coddes","Validaciones"])
-        via["Fecha"] = pd.to_datetime(via["Fecha"])
-        for registro in decision_interurbanos.iterrows():
-            registro = registro[1]
-            if registro["DECISION"] == "VIA":
-                finaldf = pd.concat([finaldf, via[via["Concesion"]==registro["CONCESION"]]], axis=0)
-                finaldf.Fecha = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
-            elif registro["DECISION"] == "BIT":
-                bit.rename(columns={"Periodo":"Fecha","Subidos":"Validaciones"}, inplace=True, errors="ignore")
-                finaldf = pd.concat([finaldf, bit[bit["Concesion"]==registro["CONCESION"]]], axis=0)
-                finaldf.Fecha = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
-            elif registro["DECISION"] == "VIA+Reg. Base":
-                new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Coddes"])
-                new_df = via[via["Concesion"]==registro["CONCESION"]]
-                decision_inter = decision_interurbanos[decision_interurbanos["CONCESION"]==registro["CONCESION"]]
-                new_df = pd.concat([new_df, via[via["Concesion"]==registro["CONCESION"]]], axis=0)
-                new_df.Fecha = pd.to_datetime(new_df.Fecha).dt.strftime("%d/%m/%Y")
-                line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":via["Fecha"].dt.strftime("%m/%Y"), "Codtit":"Regulariza", "Validaciones":decision_inter["BASE-VIA"], "Coddes":"Regulariza"}, index=[0])
-                new_df = pd.concat([new_df, line], axis=0)
+    finaldf = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Coddes","Validaciones","Origen"])
+    for registro in decision_interurbanos.iterrows():
+        new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Coddes","Origen"])
+        registro = registro[1]
+        if registro["DECISION"] == "VIA":
+            new_df = via[via["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.loc[:, "Fecha"] = pd.to_datetime(new_df.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
+            new_df.loc[:,"Origen"] = "VIA"
+            if not new_df.empty and new_df.count().sum() > 0:
                 finaldf = pd.concat([finaldf, new_df], axis=0)
-            elif registro["DECISION"] == "BIT+Reg. Base":
-                bit.rename(columns={"Periodo":"Fecha","Subidos":"Validaciones"}, inplace=True, errors="ignore")
-                new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Coddes"])
-                new_df = bit[bit["Concesion"]==registro["CONCESION"]]
-                decision_inter = decision_interurbanos[decision_interurbanos["CONCESION"]==registro["CONCESION"]]
-                new_df = pd.concat([new_df, bit[bit["Concesion"]==registro["CONCESION"]]], axis=0)
-                new_df.Fecha = pd.to_datetime(new_df.Fecha).dt.strftime("%d/%m/%Y")
-                line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":bit["Fecha"].dt.strftime("%m/%Y"), "Codtit":"Regulariza", "Validaciones":decision_inter["BASE-VIA"], "Coddes":"Regulariza"}, index=[0])
-                new_df = pd.concat([new_df, line], axis=0)
+        elif registro["DECISION"] == "BIT":
+            bit.rename(columns={"Periodo":"Fecha","Subidos":"Validaciones"}, inplace=True, errors="ignore")
+            new_df = bit[bit["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.loc[:, "Fecha"] = pd.to_datetime(finaldf.Fecha, format='%m-%d-%Y').dt.strftime("%d/%m/%Y")
+            new_df.loc[:,"Origen"] = "BIT"
+            if not new_df.empty and new_df.count().sum() > 0:
                 finaldf = pd.concat([finaldf, new_df], axis=0)
-        return finaldf
-    except Exception as e:
-        print(e)
-        raise e
+        elif registro["DECISION"] == "VIA+Reg. Base":
+            new_df.loc[:,"Origen"] = "VIA"
+            new_df = via[via["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.loc[:, "Fecha"] = pd.to_datetime(new_df.Fecha, format='%m-%d-%Y').dt.strftime("%d/%m/%Y")
+            line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":pd.Timestamp(datetime.now()), "Codtit":"Regulariza", "Validaciones":registro["BASE-VIA"], "Coddes":"Regulariza", "Origen":"Reg. Base"}, index=[0])
+            print(line)
+            if not new_df.empty and new_df.count().sum() > 0:
+                print("------- line ",line.shape)
+                finaldf = pd.concat([finaldf, new_df, line], axis=0, ignore_index=True)
+        elif registro["DECISION"] == "BIT+Reg. Base":
+            bit.rename(columns={"Periodo":"Fecha","Subidos":"Validaciones"}, inplace=True, errors="ignore")
+            new_df.loc[:,"Origen"] = "BIT"
+            new_df = bit[bit["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.loc[:, "Fecha"] = pd.to_datetime(new_df.Fecha).dt.strftime("%d/%m/%Y")
+            line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":pd.Timestamp(datetime.now()), "Codtit":"Regulariza", "Validaciones":registro["BASE-VIA"], "Coddes":"Regulariza", "Origen":"Reg. Base"}, index=[0])
+            if not new_df.empty and new_df.count().sum() > 0:
+                print("------- line ",line.shape)
+                print(line)
+                finaldf = pd.concat([finaldf, new_df, line], axis=0)
+        elif registro["DECISION"] == "no coincide nada":
+            line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":pd.Timestamp(datetime.now()), "Codtit":"revisar", "Validaciones":"revisar", "Coddes":"revisar", "Origen":"revisar"}, index=[0])
+            print("------- line ",line.shape)
+            print(line)
+            finaldf = pd.concat([finaldf, line], axis=0)
+        elif registro["DECISION"] == "BIT (sin via-base)":
+            bit.rename(columns={"Periodo":"Fecha","Subidos":"Validaciones"}, inplace=True, errors="ignore")
+            new_df = bit[bit["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.loc[:, "Fecha"] = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
+            new_df.loc[:,"Origen"] = "BIT (sin via-base)"
+            if not new_df.empty and new_df.count().sum() > 0:
+                finaldf = pd.concat([finaldf, new_df], axis=0)
+        print(registro["CONCESION"], new_df.shape[0], finaldf.shape[0], registro["DECISION"])
+    return finaldf
+    
 
 def contruir_tabla_final_vacs(vacs_decision, vacs):
-    try:
-        finaldf = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Coddes","Validaciones"])
-        for registro in vacs_decision.iterrows():
-            registro = registro[1]
-            if registro["DECISION"] == "VAC":
-                finaldf = pd.concat([finaldf, vacs[vacs["Concesion"]==registro["CONCESION"]]], axis=0)
-                finaldf.Fecha = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
-            elif registro["DECISION"] == "VAC+Reg. Base":
-                new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Coddes"])
-                new_df = vacs[vacs["Concesion"]==registro["CONCESION"]]
-                decision_inter = vacs_decision[vacs_decision["CONCESION"]==registro["CONCESION"]]
-                new_df = pd.concat([new_df, vacs[vacs["Concesion"]==registro["CONCESION"]]], axis=0)
-                new_df.Fecha = pd.to_datetime(new_df.Fecha).dt.strftime("%d/%m/%Y")
-                line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":vacs["Fecha"].dt.strftime("%m/%Y"), "Codtit":"Regulariza", "Validaciones":decision_inter["BASE-VIA"], "Coddes":"Regulariza"}, index=[0])
-                new_df = pd.concat([new_df, line], axis=0)
+    finaldf = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones","Origen"])
+    for registro in vacs_decision.iterrows():
+        registro = registro[1]
+        if registro["DECISION"] == "VAC":
+            new_df = vacs[vacs["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.Fecha = pd.to_datetime(finaldf.Fecha, format="mixed").dt.strftime("%d/%m/%Y")
+            new_df["Origen"] = "VAC"
+            if not new_df.empty and new_df.count().sum() > 0:
                 finaldf = pd.concat([finaldf, new_df], axis=0)
-        return finaldf
-    except Exception as e:
-        print(e)
-        raise e
+        elif registro["DECISION"] == "VAC+Reg. Base":
+            new_df = pd.DataFrame(columns=["Concesion","Fecha","Codtit","Validaciones"])
+            new_df = vacs[vacs["Concesion"]==registro["CONCESION"]].copy()
+            #new_df.Fecha = pd.to_datetime(new_df.Fecha).dt.strftime("%d/%m/%Y")
+            finaldf["Origen"] = "VAC"
+            line = pd.DataFrame({"Concesion":registro["CONCESION"], "Fecha":pd.Timestamp(datetime.now()), "Codtit":"Regulariza", "Validaciones":registro["BASE-VIA"], "Coddes":"Regulariza", "Origen":"Reg. Base"}, index=[0])
+            if not new_df.empty and new_df.count().sum() > 0:
+                finaldf = pd.concat([finaldf, new_df, line], axis=0)
+        print(registro["CONCESION"], new_df.shape[0], finaldf.shape[0], registro["DECISION"])
+    return finaldf

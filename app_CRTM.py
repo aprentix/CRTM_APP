@@ -130,8 +130,8 @@ def main(page: Page):
                 save_file_path.value = directory_path if e.path else "Descarga cancelada"
                 os.makedirs(directory_path, exist_ok=True)
                 with pd.ExcelWriter(file_path) as writer:
-                    decision_interurbanos_vcm.to_excel(writer, "interurbanos_vcm", index_label=None)
-                    decision_vacs.to_excel(writer, "vacs")
+                    decision_interurbanos_vcm.to_excel(writer, "interurbanos_vcm", index=False)
+                    decision_vacs.to_excel(writer, "vacs", index=False)
                 print("ARCHIVOS CREADOS")
             else:
                 print("NO PATH SELECTED")  
